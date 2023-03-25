@@ -1,0 +1,5 @@
+.replay-video-streamer {
+    filter: url(#video_filter);
+}
+.replay-video-streamer::before {
+}

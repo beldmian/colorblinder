@@ -1,0 +1,37 @@
+version: "3.9"
+
+volumes:
+  prometheus_data: {}
+  grafana-data:
+
+networks:
+  internal:
+  monitoring:
+    driver: bridge
+
+
+services:
+  backend:
+    container_name: "backend"
+    build: .
+    ports:
+      - "8080:8080"
+      - "2112:2112"
+    networks:
+      - internal
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    volumes:
+      - ./deploy/prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    restart: always
+    depends_on:
+       - backend
+    networks:
+      - internal
+      - monitoring

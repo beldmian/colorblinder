@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: colorblinder-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: colorblinder-backend
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: colorblinder-backend
+    spec:
+      containers:
+        - image: colorblinder/backend
+          name: backend
+          ports:
+            - containerPort: 8080
+            - containerPort: 2112
+          resources: 
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          imagePullPolicy: Never
+      restartPolicy: Always
+status: {}
