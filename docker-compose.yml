@@ -19,6 +19,13 @@ services:
       - "2112:2112"
     networks:
       - internal
+  web:
+    container_name: "web"
+    build: ./web
+    ports: 
+      - "3000:3000"
+    networks:
+      - internal
   prometheus:
     image: prom/prometheus:v2.36.2
     volumes:

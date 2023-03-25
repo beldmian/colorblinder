@@ -1,7 +1,6 @@
 package server
 
 import (
-	"colorblinder/internal/filter"
 	"colorblinder/pkg/config"
 	"context"
 
@@ -15,7 +14,6 @@ type Server struct {
 	Address string
 	e       *echo.Echo
 	l       *zap.Logger
-	filters map[string]filter.Filter
 }
 
 func ProvideServer(config *config.Config, l *zap.Logger) *Server {
@@ -33,12 +31,10 @@ func ProvideServer(config *config.Config, l *zap.Logger) *Server {
 		Address: config.ServerConfig.Address,
 		e:       e,
 		l:       l,
-		filters: make(map[string]filter.Filter),
 	}
 }
 
 func (s *Server) Start() error {
-	s.e.POST("/create_filter", s.CreateFilter)
 	s.e.POST("/start_stream", s.StartStream)
 
 	s.e.Use(s.LoggingMiddleware)

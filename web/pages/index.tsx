@@ -30,34 +30,20 @@ export default function Home() {
     console.log(color)
     setLoading(true)
     if (isPhotosensitive) {
-      const req = await fetch('http://127.0.0.1:8080/create_filter', {
+      const req = await fetch('http://127.0.0.1:8080/start_stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          rgba_overlay: [color.r, color.g, color.b, parseInt(color.a*100)],
-          start_second: 0,
-          is_photosensitive: true
-        })
-      })
-      const res = await req.json()
-      console.log(res)
-      const req2 = await fetch('http://127.0.0.1:8080/start_stream', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          filter_id: res.id,
           stream_url: url
         })
       })
-      const res2 = await req2.json()
+      const res = await req.json()
       while (true) {
-        const req3 = await fetch("http://127.0.0.1:8080"+res2.new_url)
-        if (req3.status === 200) {
-          setEndUrl("http://127.0.0.1:8080"+res2.new_url)
+        const req2= await fetch("http://127.0.0.1:8080"+res.new_url)
+        if (req2.status === 200) {
+          setEndUrl("http://127.0.0.1:8080"+res.new_url)
           setLoading(false)
           break
         }
