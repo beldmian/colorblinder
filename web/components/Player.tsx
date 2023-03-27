@@ -11,7 +11,8 @@ export default function Player({ url }: PlayerProps) {
         <>
             <Replay
                 source={url}
-                initialPlaybackProps={{ isPaused: true }}
+                initialPlaybackProps={{ isPaused: false }}
+                options={{controls:{liveDisplayMode: 'live-offset'}}}
             >
                 <ShakaVideoStreamer />
             </Replay>

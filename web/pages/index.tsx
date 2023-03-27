@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import {Button, Typography, Card, Col, Row,
-  Space, Input, Spin, Switch, Slider, InputNumber} from 'antd'
-import { SketchPicker } from 'react-color';
+  Space, Input, Spin, Switch, Slider, InputNumber, ConfigProvider, theme} from 'antd'
+import { RgbaColorPicker } from 'react-colorful'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import Filter from '@/components/Filter';
@@ -11,17 +11,21 @@ const DynamicPlayer = dynamic(() => import('../components/Player'), {
 })
 
 export default function Home() {
+  let componentToHex = (c) => {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+  }
+  let rgbToHex = (r, g, b) => {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+  }
   let [url, setUrl] = useState("")
   let [endUrl, setEndUrl] = useState("")
   let [loading, setLoading] = useState(false)
   let [color, setColor] = useState({
-    hex: '#ffffff',
-    rgb: {
       r: 255,
       g: 255,
       b: 255,
       a: 0
-    }
   })
   let [contrast, setContrast] = useState(1)
   let [saturate, setSaturate] = useState(1)
@@ -56,14 +60,22 @@ export default function Home() {
   }
   return (
     <>
-      {color.rgb != undefined && (
+      {/* {color.rgb != undefined && ( */}
         <div style={{opacity: 0}}>
-          <Filter color={color.hex} color_opacity={color.rgb.a} saturation={saturate} contrast={contrast} />
+          <Filter color={rgbToHex(color.r, color.g, color.b)} color_opacity={color.a} saturation={saturate} contrast={contrast} />
         </div>
-      )}
+      {/* )} */}
       <Head>
         <title>Colorblinder</title>
       </Head>
+      <ConfigProvider
+        theme={{
+          // token: {
+          //   colorPrimary: '#00b96b',
+          // },
+          algorithm: theme.darkAlgorithm,
+        }}
+      >
       <Row gutter={16}>
         <Col span={12}>
           <Card title="Настройки" size="default">
@@ -92,10 +104,10 @@ export default function Home() {
                 />
               </Space>
               <Space>
-                <SketchPicker color={color.rgb} onChange={(color) => setColor(color)} />
+                <RgbaColorPicker color={color} onChange={setColor} />
                 <div style={{
-                  width: "300px",
-                  height: "300px",
+                  width: "200px",
+                  height: "200px",
                   backgroundImage: `url("/img/colorwheel.png")`,
                   backgroundSize: "cover",
                   filter: "url(#video_filter)",
@@ -122,6 +134,7 @@ export default function Home() {
           </Card>
         </Col>
       </Row>
+      </ConfigProvider>
     </>
   )
 }

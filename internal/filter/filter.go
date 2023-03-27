@@ -24,6 +24,7 @@ func StartProcess(id string, url string) error {
 	cmdSlice = append(cmdSlice, filters...)
 	cmdSlice = append(cmdSlice,
 		"-f", "dash", "-seg_duration", "1", "-adaptation_sets", "id=0,streams=v  id=1,streams=a",
+		"-ldash", "1", "-preset", "veryfast",
 		"/tmp/"+id+"/file.mpd",
 	)
 
