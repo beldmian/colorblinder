@@ -1,10 +1,11 @@
 import Head from 'next/head'
 import {Button, Typography, Card, Col, Row,
-  Space, Input, Spin, Switch, Slider, InputNumber, ConfigProvider, theme} from 'antd'
+  Space, Input, Spin, Switch, Slider, Dropdown, ConfigProvider, theme as atheme} from 'antd'
 import { RgbaColorPicker } from 'react-colorful'
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import Filter from '@/components/Filter';
+import { AppContext } from '@/context/state'
 
 const DynamicPlayer = dynamic(() => import('../components/Player'), {
   ssr: false,
@@ -58,28 +59,35 @@ export default function Home() {
     setEndUrl(url)
     setLoading(false)
   }
+  const {theme, setTheme} = useContext(AppContext)
   return (
     <>
-      {/* {color.rgb != undefined && ( */}
-        <div style={{opacity: 0}}>
-          <Filter color={rgbToHex(color.r, color.g, color.b)} color_opacity={color.a} saturation={saturate} contrast={contrast} />
-        </div>
-      {/* )} */}
-      <Head>
-        <title>Colorblinder</title>
-      </Head>
+    <Head>
+      <title>Colorblinder</title>
+    </Head>
+    <div style={{minHeight: "100vh", backgroundColor: `${theme === "light" ? "#fff" : "#141414"}`}}>
+      <div style={{opacity: 0}}>
+        <Filter color={rgbToHex(color.r, color.g, color.b)} color_opacity={color.a} saturation={saturate} contrast={contrast} />
+      </div>
       <ConfigProvider
         theme={{
-          // token: {
-          //   colorPrimary: '#00b96b',
-          // },
-          algorithm: theme.darkAlgorithm,
+          algorithm: theme == "light" ? atheme.defaultAlgorithm : atheme.darkAlgorithm,
         }}
       >
-      <Row gutter={16}>
-        <Col span={12}>
+      <Row gutter={[16, 16]} style={{width:"90%", margin:"auto"}}>
+        <Col xl={12} xs={24}>
           <Card title="Настройки" size="default">
             <Space direction='vertical'>
+              <Space direction='vertical'>
+                <Typography.Title level={3}>Настройки плеера</Typography.Title>
+                <Space>
+                  <Typography>Тема интерфейса</Typography>
+                  <Space.Compact block>
+                    <Button disabled={theme == "light"} onClick={() => setTheme("light")}>Светлая</Button>
+                    <Button disabled={theme == "dark"} onClick={() => setTheme("dark")}>Темная</Button>
+                  </Space.Compact>
+                </Space>
+              </Space>
               <Typography.Title level={3}>Настройки фильтра</Typography.Title>
               <Space>
                 <Typography>Контрастность</Typography>
@@ -128,13 +136,14 @@ export default function Home() {
             </Space>
           </Card>
         </Col>
-        <Col span={12}>
+        <Col xl={12} xs={24}>
           <Card title="Плеер" size="default">
               <DynamicPlayer url={endUrl} />
           </Card>
         </Col>
       </Row>
       </ConfigProvider>
+    </div>
     </>
   )
 }
