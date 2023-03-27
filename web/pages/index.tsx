@@ -80,47 +80,63 @@ export default function Home() {
             <Space direction='vertical'>
               <Space direction='vertical'>
                 <Typography.Title level={3}>Настройки плеера</Typography.Title>
-                <Space>
-                  <Typography>Тема интерфейса</Typography>
-                  <Space.Compact block>
-                    <Button disabled={theme == "light"} onClick={() => setTheme("light")}>Светлая</Button>
-                    <Button disabled={theme == "dark"} onClick={() => setTheme("dark")}>Темная</Button>
-                  </Space.Compact>
-                </Space>
+                <Row align="middle" gutter={[8, 8]}>
+                  <Col flex="none">
+                    <Typography>Тема интерфейса</Typography>
+                  </Col>
+                  <Col flex="auto">
+                    <Space.Compact block>
+                      <Button disabled={theme == "light"} onClick={() => setTheme("light")}>Светлая</Button>
+                      <Button disabled={theme == "dark"} onClick={() => setTheme("dark")}>Темная</Button>
+                    </Space.Compact>
+                  </Col>
+                </Row>
               </Space>
               <Typography.Title level={3}>Настройки фильтра</Typography.Title>
-              <Space>
-                <Typography>Контрастность</Typography>
-                <Slider
-                style={{width: "200px"}}
-                  min={0}
-                  max={5}
-                  onChange={(value) => setContrast(value)}
-                  value={contrast}
-                  step={0.01}
-                />
-              </Space>
-              <Space>
-                <Typography>Насыщенность</Typography>
-                <Slider
-                style={{width: "200px"}}
-                  min={0}
-                  max={5}
-                  onChange={(value) => setSaturate(value)}
-                  value={saturate}
-                  step={0.01}
-                />
-              </Space>
-              <Space>
-                <RgbaColorPicker color={color} onChange={setColor} />
-                <div style={{
-                  width: "200px",
-                  height: "200px",
-                  backgroundImage: `url("/img/colorwheel.png")`,
-                  backgroundSize: "cover",
-                  filter: "url(#video_filter)",
-                }}></div>
-              </Space>
+              <Row align="middle" gutter={[8, 8]}>
+                <Col flex="none">
+                  <Typography>Контрастность</Typography>
+                </Col>
+                <Col flex="auto">
+                  <Slider
+                  style={{width: "200px"}}
+                    min={0}
+                    max={5}
+                    onChange={(value) => setContrast(value)}
+                    value={contrast}
+                    step={0.01}
+                  />
+                </Col>
+              </Row>
+              <Row align="middle" gutter={[8, 8]}>
+                <Col flex="none">
+                  <Typography>Насыщенность</Typography>
+                </Col>
+                <Col flex="auto">
+                  <Slider
+                  style={{width: "200px"}}
+                    min={0}
+                    max={5}
+                    onChange={(value) => setSaturate(value)}
+                    value={saturate}
+                    step={0.01}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col sm={12} xs={24}>
+                  <RgbaColorPicker color={color} onChange={setColor} />
+                </Col>
+                <Col sm={12} xs={24}>
+                  <div style={{
+                    width: "200px",
+                    height: "200px",
+                    backgroundImage: `url("/img/colorwheel.png")`,
+                    backgroundSize: "cover",
+                    filter: "url(#video_filter)",
+                  }}></div>
+                </Col>
+              </Row>
               <Space>
                 <Switch onChange={(checked) => setIsPhotosensitive(checked)}/>
                 <Typography>Фильтрация сцен, которые могут вызвать эпилептический припадок</Typography>
