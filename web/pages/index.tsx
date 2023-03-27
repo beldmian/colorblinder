@@ -12,6 +12,7 @@ const DynamicPlayer = dynamic(() => import('../components/Player'), {
 })
 
 export default function Home() {
+  let api_url = process.env.NODE_ENV === 'production'? 'http://colorblinder.beldmian.ru:8080' : 'http://127.0.0.1:8080'
   let componentToHex = (c) => {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -35,7 +36,7 @@ export default function Home() {
     console.log(color)
     setLoading(true)
     if (isPhotosensitive) {
-      const req = await fetch('http://127.0.0.1:8080/start_stream', {
+      const req = await fetch(api_url+'/start_stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -46,9 +47,9 @@ export default function Home() {
       })
       const res = await req.json()
       while (true) {
-        const req2= await fetch("http://127.0.0.1:8080"+res.new_url)
+        const req2= await fetch(api_url+res.new_url)
         if (req2.status === 200) {
-          setEndUrl("http://127.0.0.1:8080"+res.new_url)
+          setEndUrl(api_url+res.new_url)
           setLoading(false)
           break
         }
