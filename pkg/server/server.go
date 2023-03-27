@@ -3,6 +3,8 @@ package server
 import (
 	"colorblinder/pkg/config"
 	"context"
+	"sync"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -10,10 +12,18 @@ import (
 	"go.uber.org/zap"
 )
 
+type FilterInfo struct {
+	ID                string
+	ContextCancel     context.CancelFunc
+	LastExecutionTime time.Time
+}
+
 type Server struct {
-	Address string
-	e       *echo.Echo
-	l       *zap.Logger
+	Address         string
+	e               *echo.Echo
+	l               *zap.Logger
+	activeFilters   map[string]FilterInfo
+	activeFiltersMu sync.Mutex
 }
 
 func ProvideServer(config *config.Config, l *zap.Logger) *Server {
@@ -25,12 +35,13 @@ func ProvideServer(config *config.Config, l *zap.Logger) *Server {
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{"*"},
 	}))
-	e.Use()
 	e.Static("/stream", "/tmp")
 	return &Server{
-		Address: config.ServerConfig.Address,
-		e:       e,
-		l:       l,
+		Address:         config.ServerConfig.Address,
+		e:               e,
+		l:               l,
+		activeFilters:   make(map[string]FilterInfo),
+		activeFiltersMu: sync.Mutex{},
 	}
 }
 
@@ -38,6 +49,7 @@ func (s *Server) Start() error {
 	s.e.POST("/start_stream", s.StartStream)
 
 	s.e.Use(s.LoggingMiddleware)
+	s.e.Use(s.ActiveFiltersMiddleware)
 	return s.e.Start(s.Address)
 }
 

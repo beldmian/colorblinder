@@ -3,6 +3,7 @@ package filter
 import (
 	"bytes"
 	"colorblinder/pkg/metrics"
+	"context"
 	"log"
 	"os"
 	"os/exec"
@@ -10,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func StartProcess(id string, url string) error {
+func StartProcess(ctx context.Context, id string, url string) error {
 	var errorBuf bytes.Buffer
 	if err := os.Mkdir("/tmp/"+id, os.ModePerm); err != nil {
 		return err
@@ -28,10 +29,18 @@ func StartProcess(id string, url string) error {
 		"/tmp/"+id+"/file.mpd",
 	)
 
-	cmd := exec.Command("ffmpeg", cmdSlice...)
+	cmd := exec.CommandContext(ctx, "ffmpeg", cmdSlice...)
 	cmd.Stderr = &errorBuf
 	metrics.ActiveFilterers.Inc()
 	if err := cmd.Run(); err != nil {
+		metrics.ActiveFilterers.Dec()
+		err := os.RemoveAll("/tmp/" + id)
+		if err != nil {
+			log.Println("cleanup error: ", err)
+		}
+		if ctx.Err() == context.Canceled {
+			return nil
+		}
 		return errors.WithMessage(err, errorBuf.String())
 	}
 	defer func(path string) {

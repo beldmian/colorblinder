@@ -4,6 +4,7 @@ import (
 	"colorblinder/internal/filter"
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -24,17 +25,21 @@ func (s *Server) StartStream(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 	go func(url string) {
-		err := filter.StartProcess(pid, url)
+		err := filter.StartProcess(ctx, pid, url)
 		if err != nil {
 			s.l.Warn("error processing", zap.Error(err))
 		}
-		ctx.Done()
 	}(req.StreamURL)
 	go func() {
 		<-ctx.Done()
 		s.l.Info("killed stream process", zap.String("id", pid))
 	}()
+	s.activeFilters[pid] = FilterInfo{
+		ID:                pid,
+		ContextCancel:     cancel,
+		LastExecutionTime: time.Now(),
+	}
 	return c.JSON(http.StatusOK, StartStreamResponse{NewURL: "/stream/" + pid + "/file.mpd"})
 }
