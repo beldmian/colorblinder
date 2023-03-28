@@ -12,8 +12,7 @@ const DynamicPlayer = dynamic(() => import('../components/Player'), {
 })
 
 export default function Home() {
-  // let api_url = process.env.NODE_ENV === 'production'? 'http://colorblinder.beldmian.ru:8080' : 'http://127.0.0.1:8080'
-  let api_url = "http://localhost:8080"
+  let api_url = "http://0.0.0.0:8080"
   let componentToHex = (c) => {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
