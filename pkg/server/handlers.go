@@ -2,6 +2,7 @@ package server
 
 import (
 	"colorblinder/internal/filter"
+	"colorblinder/pkg/cleaner"
 	"context"
 	"net/http"
 	"time"
@@ -36,10 +37,10 @@ func (s *Server) StartStream(c echo.Context) error {
 		<-ctx.Done()
 		s.l.Info("killed stream process", zap.String("id", pid))
 	}()
-	s.activeFilters[pid] = FilterInfo{
+	s.c.AddFilter(cleaner.FilterInfo{
 		ID:                pid,
 		ContextCancel:     cancel,
 		LastExecutionTime: time.Now(),
-	}
+	})
 	return c.JSON(http.StatusOK, StartStreamResponse{NewURL: "/stream/" + pid + "/file.mpd"})
 }

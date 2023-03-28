@@ -1,6 +1,7 @@
 package main
 
 import (
+	"colorblinder/pkg/cleaner"
 	"colorblinder/pkg/config"
 	"colorblinder/pkg/logger"
 	"colorblinder/pkg/metrics"
@@ -22,9 +23,11 @@ func main() {
 		}),
 		fx.Provide(
 			server.ProvideServer,
+			cleaner.ProvideCleaner,
 		),
 		fx.Invoke(
 			server.InvokeServer,
+			cleaner.InvokeCleaner,
 			metrics.InvokeMetricsServer,
 		),
 	)

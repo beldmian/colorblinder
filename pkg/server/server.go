@@ -1,10 +1,9 @@
 package server
 
 import (
+	"colorblinder/pkg/cleaner"
 	"colorblinder/pkg/config"
 	"context"
-	"sync"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -12,21 +11,14 @@ import (
 	"go.uber.org/zap"
 )
 
-type FilterInfo struct {
-	ID                string
-	ContextCancel     context.CancelFunc
-	LastExecutionTime time.Time
-}
-
 type Server struct {
-	Address         string
-	e               *echo.Echo
-	l               *zap.Logger
-	activeFilters   map[string]FilterInfo
-	activeFiltersMu sync.Mutex
+	Address string
+	e       *echo.Echo
+	l       *zap.Logger
+	c       *cleaner.Cleaner
 }
 
-func ProvideServer(config *config.Config, l *zap.Logger) *Server {
+func ProvideServer(config *config.Config, l *zap.Logger, c *cleaner.Cleaner) *Server {
 	e := echo.New()
 	e.HideBanner = true
 	e.HidePort = true
@@ -37,11 +29,10 @@ func ProvideServer(config *config.Config, l *zap.Logger) *Server {
 	}))
 	e.Static("/stream", "/tmp")
 	return &Server{
-		Address:         config.ServerConfig.Address,
-		e:               e,
-		l:               l,
-		activeFilters:   make(map[string]FilterInfo),
-		activeFiltersMu: sync.Mutex{},
+		Address: config.ServerConfig.Address,
+		e:       e,
+		l:       l,
+		c:       c,
 	}
 }
 
